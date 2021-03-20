@@ -341,6 +341,14 @@ SL = {
 			LifePercentChangeHeld=IsGame("pump") and 0.000 or 0.008,
 			LifePercentChangeHitMine=-0.05,
 		},
+	},
+	-- Fields used to determine the existence of the launcher and the
+	-- available GrooveStats services.
+	GrooveStats = {
+		Launcher = false,
+		GetScore = false,
+		Leaderboard = false,
+		AutoSubmit = false
 	}
 }
 
