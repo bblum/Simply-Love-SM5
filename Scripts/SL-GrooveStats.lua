@@ -12,7 +12,7 @@
 -- af[#af+1] = Def.Actor{
 --   OnCommand=function(self)
 --     MESSAGEMAN:Broadcast("GetScores", {
--- 	     data={..},
+--       data={..},
 --       args={..},
 --       callback=function(data, args)
 --         SCREENMAN:SystemMessage(tostring(data)..tostring(args))
