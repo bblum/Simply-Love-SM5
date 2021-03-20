@@ -566,3 +566,11 @@ GetComboFonts = function()
 
 	return fonts
 end
+
+-- -----------------------------------------------------------------------
+-- Checks to see if we're wrapping StepMania/Simply Love with the GrooveStats launcher that
+-- can make requests/responses.
+
+IsUsingLauncher = function()
+	return GAMESTATE:Env()["GsLauncher"] ~= nil and GAMESTATE:Env()["GsLauncher"] == true
+end

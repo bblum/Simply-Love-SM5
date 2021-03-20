@@ -67,6 +67,7 @@ end
 -- af2 contains things that should fade out during the OffCommand
 local af2 = Def.ActorFrame{}
 af2.OffCommand=function(self) self:smooth(0.65):diffusealpha(0) end
+af2.Name="SLInfo"
 
 
 -- the big blocky Wendy text that says SIMPLY LOVE (or SIMPLY THONK, or SIMPLY DUCKS, etc.)
@@ -100,6 +101,89 @@ if HolidayCheer() then
 		InitCommand=function(self) self:zoom(0.225):xy( 130, -self:GetHeight()/2 ):rotationz(15):queuecommand("Drop") end,
 		DropCommand=function(self) self:decelerate(1.333):y(-110) end,
 	}
+end
+
+-- -----------------------------------------------------------------------
+-- af3 contains all of the things related to displaying the GrooveStats connection
+
+if IsUsingLauncher() then
+	af3 = Def.ActorFrame{
+		Name="GrooveStatsInfo",
+		InitCommand=function(self) self:zoom(0.8):y(-_screen.cy+15):x(_screen.cx-65):diffusealpha(0) end,
+		OnCommand=function(self) self:sleep(0.2):linear(0.4):diffusealpha(1) end,
+	}
+
+	af3[#af3+1] = LoadFont("Common Normal")..{
+		Text="GrooveStats",
+		InitCommand=function(self) self:diffuse(TextColor):horizalign(center) end,
+	}
+
+	af3[#af3+1] = LoadFont("Common Normal")..{
+		Name="GetScores",
+		Text=" ...   GetScores",
+		InitCommand=function(self) self:diffuse(TextColor):addx(-40):addy(18):horizalign(left) end,
+	}
+
+	af3[#af3+1] = LoadFont("Common Normal")..{
+		Name="Leaderboard",
+		Text=" ...   Leaderboard",
+		InitCommand=function(self) self:diffuse(TextColor):addx(-40):addy(36):horizalign(left) end,
+	}
+
+	af3[#af3+1] = LoadFont("Common Normal")..{
+		Name="AutoSubmit",
+		Text=" ...   Auto-Submit",
+		InitCommand=function(self) self:diffuse(TextColor):addx(-40):addy(54):horizalign(left) end,
+	}
+
+	af3[#af3+1] = RequestResponseActor("NewSession", 10)
+
+	-- A dummy actor that makes the request whenever we load into this screen.
+	af3[#af3+1] = Def.Actor{
+		OnCommand=function(self)
+			MESSAGEMAN:Broadcast("NewSession", {
+				data={},
+				args=SCREENMAN:GetTopScreen():GetChild("Underlay"):GetChild("SLInfo"):GetChild("GrooveStatsInfo"),
+				callback=function(data, af3)
+					if af3 == nil then return end
+
+					local get_scores = af3:GetChild("GetScores")
+					local leaderboard = af3:GetChild("Leaderboard")
+					local auto_submit = af3:GetChild("AutoSubmit")
+
+					if data["servicesAllowed"] ~= nil then
+						local services = data["servicesAllowed"]
+			
+						if get_scores ~= nil and services["playerScores"] ~= nil then
+							if services["playerScores"] then
+								get_scores:settext("✔ GetScores")
+							else
+								get_scores:settext("❌ GetScores")
+							end
+						end
+			
+						if leaderboard ~= nil and services["playerLeaderboards"] ~= nil then
+							if services["playerLeaderboards"] then
+								leaderboard:settext("✔ Leaderboard")
+							else
+								leaderboard:settext("❌ Leaderboard")
+							end
+						end
+			
+						if auto_submit ~= nil and services["scoreSubmit"] ~= nil then
+							if services["scoreSubmit"] then
+								auto_submit:settext("✔ Auto-Submit")
+							else
+								auto_submit:settext("❌ Auto-Submit")
+							end
+						end
+					end
+				end
+			})
+		end
+	}
+
+	af2[#af2+1] = af3
 end
 
 -- ensure that af2 is added as a child of af
